@@ -87,3 +87,57 @@ class E2EE {
         return key;
     }
 }
+
+let pub;
+(async () => {
+    const e2ee = new E2EE();
+    await e2ee.generateKey();
+    pub = e2ee.marshal(e2ee.getPublicKey().publicKey);
+    socket.on("message", async function listener({ message }) {
+        if (!message.startsWith("MIXEDKEY")) return;
+        socket.off("message", listener);
+        const shared = message.slice("MIXEDKEY".length);
+        const key = await e2ee.unmarshal(shared);
+        // arrive at shared key
+        await e2ee.setRemotePublicKey(key);
+    });
+
+    const currentOnSubmit = form.onsubmit;
+
+    form.onsubmit = async e => {
+        e.preventDefault();
+        const message = form.elements.message.value;
+        const { buffer, counter } = await e2ee.encrypt(message);
+        const serialized = JSON.stringify({
+            buffer: window.btoa(String.fromCharCode(buffer)),
+            counter: window.btoa(String.fromCharCode(counter)),
+        });
+
+        form.elements.message.value = serialized;
+
+        currentOnSubmit(e);
+
+        messages.querySelector("li:last-child").remove();
+        messages.appendChild(mkmsg({ message, username, self: true }));
+
+        return false;
+    };
+
+    socket.on("message", async ({ message, username }) => {
+        if (message.startsWith("MIXEDKEY")) return;
+        const deserialized = JSON.parse(message);
+        const buffer = new Uint8Array(
+            [...window.atob(deserialized.buffer)].map(c => c.charCodeAt(0))
+        );
+        const counter = new Uint8Array(
+            [...window.atob(deserialized.counter)].map(c => c.charCodeAt(0))
+        );
+        const decrypted = await e2ee.decrypt({ buffer, counter });
+        messages.querySelector("li:last-child").remove();
+        messages.appendChild(mkmsg({ message: decrypted, username: username }));
+    });
+})();
+
+function sendPublicKey() {
+    pub.then(key => socket.emit("message", { message: `MIXEDKEY${key}`, username }));
+}
