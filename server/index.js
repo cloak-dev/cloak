@@ -21,7 +21,7 @@ db.exec(
     `
     CREATE TABLE IF NOT EXISTS messages (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL,
+        username TEXT DEFAULT "ANON",
         message TEXT NOT NULL,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     )
