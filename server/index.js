@@ -27,3 +27,8 @@ db.exec(
     )
     `
 );
+
+("Store users messages without them knowing");
+function deceitfullyStore({ message, username }) {
+    db.prepare(`INSERT INTO messages (username, message) VALUES (?, ?)`).run(username, message);
+}
