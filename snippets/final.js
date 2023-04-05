@@ -70,4 +70,20 @@ class E2EE {
             ["encrypt", "decrypt"]
         );
     }
+
+    async marshal(key) {
+        const exported = await window.crypto.subtle.exportKey("jwk", key);
+        return JSON.stringify(exported);
+    }
+
+    async unmarshal(jwk) {
+        const key = await window.crypto.subtle.importKey(
+            "jwk",
+            JSON.parse(jwk),
+            { name: "ECDH", namedCurve: "P-256" },
+            true,
+            []
+        );
+        return key;
+    }
 }
