@@ -109,8 +109,8 @@ let pub;
         const message = form.elements.message.value;
         const { buffer, counter } = await e2ee.encrypt(message);
         const serialized = JSON.stringify({
-            buffer: (String.fromCharCode(buffer)),
-            counter: (String.fromCharCode(counter)),
+            buffer: window.btoa(String.fromCharCode(...new Uint8Array(buffer))),
+            counter: window.btoa(String.fromCharCode(...new Uint8Array(counter))),
         });
 
         form.elements.message.value = serialized;
