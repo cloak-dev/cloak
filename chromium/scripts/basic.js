@@ -141,3 +141,19 @@ async function setup() {
 function sendPublicKey() {
     return pub.then(key => socket.emit("message", { message: `MIXEDKEY${key}`, username }));
 }
+
+setup().then(() => {
+    const button = document.querySelector("#cloak-button");
+    button.style.visibility = "visible";
+    button.addEventListener("click", () => {
+        sendPublicKey().then(() => {
+            button.innerText = "";
+            button.style.padding = button.style.margin = 0;
+            button.style.borderRadius = "50%";
+
+            const img = document.querySelector("#cloak-logo");
+            img.style.visibility = "visible";
+            button.appendChild(img);
+        });
+    });
+});
