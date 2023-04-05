@@ -21,7 +21,21 @@ class E2EE {
             ["deriveBits"]
         );
     }
-    
+
+    async encrypt(plaintext) {
+        const counter = this.generateIv();
+        const buffer = await crypto.subtle.encrypt(
+            {
+                name: "AES-CTR",
+                counter: counter,
+                length: 128,
+            },
+            this.importedKey,
+            this.stringToArrayBuffer(plaintext)
+        );
+        return { buffer, counter };
+    }
+
     getPublicKey() {
         return { publicKey: this.key.publicKey };
     }
@@ -34,5 +48,14 @@ class E2EE {
             this.key.privateKey,
             256
         );
+
+        this.importedKey = await crypto.subtle.importKey(
+            "raw",
+            this.sharedSecret,
+            "AES-CTR",
+            false,
+            ["encrypt", "decrypt"]
+        );
     }
 }
+
