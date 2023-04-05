@@ -21,6 +21,12 @@ button.innerText = "Start Encrypting";
 document.body.appendChild(button);
 document.body.appendChild(img);
 
+const scripts = {
+    localhost: { path: "scripts/basic.js" },
+    "meet.google.com": { path: "scripts/google-meet.js" },
+    "web.whatsapp.com": { path: "scripts/whatsapp.js" },
+};
+
 const s = document.createElement("script");
 
 const hostname = new URL(window.location.href).hostname;
