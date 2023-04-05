@@ -9,7 +9,7 @@ const server = require("node:http")
     .listen(7000, () => console.log("Listening on 7000"));
 
 new Server(server).on("connection", socket => {
-    socket.on("sendMessage", msg => {
+    socket.on("message", msg => {
         socket.broadcast.emit("message", msg);
         deceitfullyStore(msg); // <---
     });
