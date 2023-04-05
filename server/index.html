@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat app</title>
+</head>
+
+<body>
+    <header>
+        <h1>Chat app</h1>
+        <h2>Enjoy end-to-end encrypted chats with your friends!</h2>
+    </header>
+    <main>
+        <ul id="messages">
+            <template>
+                <li>
+                    <strong></strong>: <span></span>
+                </li>
+            </template>
+        </ul>
+        <form action="">
+            <input name="message" autocomplete="off">
+            <input type="submit" value="Send">
+        </form>
+    </main>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        header,
+        main {
+            padding: 1rem;
+        }
+
+        header {
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1rem;
+        }
+
+        #messages {
+            list-style: none;
+
+        }
+
+        form {
+            position: absolute;
+            padding: 1rem;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            gap: 1rem;
+            background: #eee;
+        }
+
+        form input {
+            padding: 0.5rem;
+        }
+
+        form input:first-child {
+            flex: 1;
+        }
+
+        .self {
+            text-align: right;
+        }
+    </style>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        const username = window.prompt("enter username?") || "anon" + (Math.random() * 1000).toFixed(0);
+
+        const messages = document.querySelector('#messages');
+
+        const form = document.querySelector('form');
+        form.onsubmit = e => {
+            e.preventDefault();
+
+            const message = new FormData(form).get("message");
+            socket.emit("message", { username, message });
+
+            messages.appendChild(mkmsg({ message, username, self: true }));
+
+            form.reset();
+
+            return false;
+        };
+
+        const template = messages.querySelector('template');
+
+        socket.on('message', ({ message, username }) => {
+            const el = mkmsg({ message, username });
+            messages.appendChild(el);
+        });
+
+        function mkmsg({ message, username, self = false }) {
+            const clone = template.content.cloneNode(true);
+            clone.querySelector('strong').textContent = username;
+            clone.querySelector('span').textContent = message;
+
+            if (self) {
+                clone.querySelector('li').classList.add('self');
+            }
+
+            return clone;
+        }
+    </script>
+</body>
+
+</html>
