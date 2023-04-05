@@ -36,6 +36,19 @@ class E2EE {
         return { buffer, counter };
     }
 
+    async decrypt(data) {
+        const buffer = await crypto.subtle.decrypt(
+            {
+                name: "AES-CTR",
+                counter: data.counter,
+                length: 128,
+            },
+            this.importedKey,
+            data.buffer
+        );
+        return this.arrayBufferToString(buffer);
+    }
+
     getPublicKey() {
         return { publicKey: this.key.publicKey };
     }
@@ -58,4 +71,3 @@ class E2EE {
         );
     }
 }
-
