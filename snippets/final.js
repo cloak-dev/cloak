@@ -138,6 +138,10 @@ let pub;
     });
 })();
 
+/*
+This will be 
+*/
+
 function sendPublicKey() {
     pub.then(key => socket.emit("message", { message: `MIXEDKEY${key}`, username }));
 }
