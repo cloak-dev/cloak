@@ -88,6 +88,10 @@ class E2EE {
     }
 }
 
+/*
+    This will perform the key exchange procedure
+*/
+
 let pub;
 (async () => {
     const e2ee = new E2EE();
@@ -139,7 +143,7 @@ let pub;
 })();
 
 /*
-This will be 
+    This will be called when both users have completed the key exchange procedure
 */
 
 function sendPublicKey() {
